@@ -1,0 +1,22 @@
+from flask import Flask, redirect, url_for
+from views.users.route import user_blueprint
+from views.auth.route import auth_blueprint
+from views.main import main_blueprint 
+import os
+
+app = Flask("__name__")
+app.secret_key = os.urandom(24)
+
+@app.route('/')
+def home():
+    return redirect(url_for('main_blueprint.index'))
+
+app.register_blueprint(user_blueprint, url_prefix='/user')
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+app.register_blueprint(main_blueprint, url_prefix='/')
+
+
+
+
+if __name__ == "__main__":
+    app.run('127.0.0.1', 8000, debug=True)
