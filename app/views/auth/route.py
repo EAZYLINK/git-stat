@@ -17,22 +17,33 @@ CONSUMER_KEY = os.getenv('CONSUMER_KEY')
 CONSUMER_SECRET = os.getenv('CLIENT_SECRET')
 
 
-github = oauth.remote_app(
-    'github',
-    consumer_key=CONSUMER_KEY,
-    consumer_secret=CONSUMER_SECRET,
-    request_token_params={'scope': 'user:email'},
-    base_url='https://api.github.com/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://github.com/login/oauth/access_token',
-    authorize_url='https://github.com/login/oauth/authorize'
-)
+# github = oauth.remote_app(
+#     'github',
+#     consumer_key=CONSUMER_KEY,
+#     consumer_secret=CONSUMER_SECRET,
+#     request_token_params={'scope': 'user:email'},
+#     base_url='https://api.github.com/',
+#     state='git-stat',
+#     allow_signup=True,
+#     request_token_url=None,
+#     access_token_method='POST',
+#     access_token_url='https://github.com/login/oauth/access_token',
+#     authorize_url='https://github.com/login/oauth/authorize'
+# )
 
 # This is the route that will be called when the user clicks the login button
 @auth_blueprint.route('/login/github')
 def login_with_github():
-    return github.authorize(callback=url_for('auth_blueprint.authorized'))
+    # return github.authorize(callback=url_for('auth_blueprint.authorized'))
+    params = {
+        'client_id': CONSUMER_KEY,
+        'redirect_uri': 'http://127.0.0.1:8000/auth/login/github/authorized',
+        'scope': 'user:email',
+        'state': 'git-stat',
+        'allow_signup': True
+    }
+    url = 'https://github.com/login/oauth/authorize'
+    return redirect(url + '?' + 'client_id=' + params['client_id'] + '&' + 'redirect_uri=' + params['redirect_uri'] + '&' + 'scope=' + params['scope'] + '&' + 'state=' + params['state'] + '&' + 'allow_signup=' + str(params['allow_signup']))
 
 # This is the callback route that github will redirect to after login
 @auth_blueprint.route('/login/github/authorized')
@@ -64,7 +75,7 @@ def authorized():
     for key, value in content.items():
         user[key] = value
         if key == 'login':
-            return redirect(url_for('dashboard_blueprint.dashboard', username=user[key]))
+            return render_template('dashboard_blueprint.dashboard', username=value)
 
 # This is the route that will be called when the user clicks the login button
 @auth_blueprint.route('/login/<message>')
