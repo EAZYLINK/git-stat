@@ -8,6 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 folder_above = os.path.dirname(current_dir)
 sys.path.append(folder_above)
 from auth.service import  user_exist, create_access_token
+from dashboard.route import dashboard_blueprint
 
 load_dotenv('.env')
 
@@ -17,33 +18,25 @@ CONSUMER_KEY = os.getenv('CONSUMER_KEY')
 CONSUMER_SECRET = os.getenv('CLIENT_SECRET')
 
 
-# github = oauth.remote_app(
-#     'github',
-#     consumer_key=CONSUMER_KEY,
-#     consumer_secret=CONSUMER_SECRET,
-#     request_token_params={'scope': 'user:email'},
-#     base_url='https://api.github.com/',
-#     state='git-stat',
-#     allow_signup=True,
-#     request_token_url=None,
-#     access_token_method='POST',
-#     access_token_url='https://github.com/login/oauth/access_token',
-#     authorize_url='https://github.com/login/oauth/authorize'
-# )
+github = oauth.remote_app(
+    'github',
+    consumer_key=CONSUMER_KEY,
+    consumer_secret=CONSUMER_SECRET,
+    request_token_params={'scope': 'user:email'},
+    base_url='https://api.github.com/',
+    access_token_method='POST',
+    access_token_url='https://github.com/login/oauth/access_token',
+    authorize_url='https://github.com/login/oauth/authorize'
+)
 
 # This is the route that will be called when the user clicks the login button
 @auth_blueprint.route('/login/github')
 def login_with_github():
-    # return github.authorize(callback=url_for('auth_blueprint.authorized'))
-    params = {
-        'client_id': CONSUMER_KEY,
-        'redirect_uri': 'http://127.0.0.1:8000/auth/login/github/authorized',
-        'scope': 'user:email',
-        'state': 'git-stat',
-        'allow_signup': True
-    }
-    url = 'https://github.com/login/oauth/authorize'
-    return redirect(url + '?' + 'client_id=' + params['client_id'] + '&' + 'redirect_uri=' + params['redirect_uri'] + '&' + 'scope=' + params['scope'] + '&' + 'state=' + params['state'] + '&' + 'allow_signup=' + str(params['allow_signup']))
+    return github.authorize(callback=url_for('auth_blueprint.authorized', _external=True))
+
+@github.tokengetter
+def get_github_oauth_token():
+    return session.get('oauth_token')
 
 # This is the callback route that github will redirect to after login
 @auth_blueprint.route('/login/github/authorized')
@@ -51,31 +44,12 @@ def authorized():
     code = request.args.get('code')
     if code is None:
         return redirect(url_for('main_blueprint.login', message=request.args.get('error')))
-    params = {
-        'client_id': CONSUMER_KEY,
-        'client_secret': CONSUMER_SECRET,
-        'code': code,
-        'redirect_uri': 'http://127.0.0.1:8000/auth/login/github/authorized',
-        'state': 'git-stat'
-    }
-    url = 'https://github.com/login/oauth/access_token'
-    response = requests.post(url, params)
-    if response.status_code != 200:
-        return "<h1>Access denied</h1>"
-    content = response.content
-    token = content.decode('utf-8').split('&')[0].split('=')[1]
-    headers = {
-        'Authorization': 'token ' + token,
-        'Accept': 'application/vnd.github.v3+json'
-    }
-    url = 'https://api.github.com/user'
-    response = requests.get(url, headers=headers)
-    content = json.loads(response.content)
-    user = {}
-    for key, value in content.items():
-        user[key] = value
-        if key == 'login':
-            return render_template('dashboard_blueprint.dashboard', username=value)
+    response = github.authorized_response()
+    if response is None or response.get('access_token') is None:
+        return 'Authorization failed!'
+    session['oauth_token'] = (response['access_token'], '')
+    user = github.get('user')
+    return redirect(url_for('dashboard_blueprint.view_dashboard', username=user.data['login']))
 
 # This is the route that will be called when the user clicks the login button
 @auth_blueprint.route('/login/<message>')
