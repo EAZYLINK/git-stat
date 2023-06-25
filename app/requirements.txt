@@ -13,6 +13,6 @@ plotly
 PyGithub==1.58.2
 PyJWT==2.7.0
 python-dateutil==2.8.2
-python-dotenv==1.0.0
+python-dotenv
 requests==2.31.0
 requests-oauthlib==1.1.0
