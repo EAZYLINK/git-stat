@@ -25,23 +25,22 @@
 <body>
     <div class="container-fluid">
         <div class="card" style="height: 90vh; background-image: url('/static/images/Capture.PNG');">
-            <div class="card-header row mb-sm-3 justify-content-sm-center bg-white">
-                <div class="col-sm-1 text-center">
-                    <img class="img-fluid" src="/static/images/icons8-github-64.png" alt="Logo">
+            <div class="card-header row mb-sm-3 bg-white align-content-sm-center">
+                <div class="card col-sm-2 border-0 align-content-sm-center">
+                    <div class="card-img text-center" >
+                        <img src="/static/images/icons8-github-64.png" alt="Logo" style="width: 50px;">
+                    </div>
+                    <h6 class="card-footer ms-sm-0 text-center text-purple border-0 p-sm-0">GitStat</h6>
                 </div>
-                <div class="col-sm-9 text-center my-3 ">
-                    <a href="/" class="text-decoration-none text-center text-purple">
-                        <h1>GitStat</h1>
-                    </a>
+                <div class="col-sm-3 mx-sm-3 my-sm-3 justify-content-sm-center">
+                    <a href="/home" class="text-decoration-none"><h2 class="text-center text-purple">Home</h2></a>
+                </div>
+                <div class="col-sm-3 mx-sm-3 my-sm-3 justify-content-sm-center">
+                    <h2 class="text-center text-purple">Login</h2>
                 </div>
             </div>
 
             <div class="card-body mx-sm-5 ">
-                <!-- <img class="card-img m-sm-0 img-fluid" src="" alt="Github Image"> -->
-                <div class=" mt-sm-2">
-                    <div class="row mx-sm-5 my-sm-3 justify-content-sm-center">
-                        <h1 class="text-white text-center">Login</h1>
-                    </div>
                     <form action="/login" method="post">
                         <div class="row mx-sm-5 my-sm-5 justify-content-sm-center">
                             <label class="col-sm-2 text-white  font-weight-200" for="username">Username</label>
