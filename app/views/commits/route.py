@@ -3,7 +3,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 folder_above = os.path.dirname(current_dir)
 sys.path.append(folder_above)
 from models.commit import Commit
-from config.db import connect_db
+from config import connect_db
 from sqlalchemy import or_, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
