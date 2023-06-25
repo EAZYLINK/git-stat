@@ -16,9 +16,3 @@ app.register_blueprint(user_blueprint, url_prefix='/user')
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 app.register_blueprint(main_blueprint, url_prefix='/')
 app.register_blueprint(dashboard_blueprint, url_prefix='/dashboard')
-
-
-
-
-if __name__ == "__main__":
-    app.run('127.0.0.1', 8000, debug=True)
