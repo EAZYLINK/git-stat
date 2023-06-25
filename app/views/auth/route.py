@@ -52,8 +52,8 @@ def authorized():
     return redirect(url_for('dashboard_blueprint.view_dashboard', username=user.data['login']))
 
 # This is the route that will be called when the user clicks the login button
-@auth_blueprint.route('/login/<message>')
-def login(message):
+@auth_blueprint.route('/login')
+def login():
     data = request.values
     try:
         user_exist = user_exist(data['username'], data['password'])
@@ -66,7 +66,9 @@ def login(message):
     except:
         return render_template('login.html', message='An error occured')
     
-@auth_blueprint.route('/protected', methods=['GET'])
-@jwt_required()
+
+@auth_blueprint.route('/protected')
+@jwt_required('github_token')
 def protected():
-    return 'You dont have access to this page'
+    if session.get('github_token') is None:
+        return redirect(url_for('auth_blueprint.login'))
